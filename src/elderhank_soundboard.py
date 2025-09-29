@@ -1,4 +1,4 @@
-import tkinter as tk
+import tkinter
 from pygame import mixer
 
 # Initialize the pygame mixer
@@ -18,18 +18,21 @@ def stop_sound():
     mixer.music.stop()
 
 # Set up the Tkinter GUI
-root = tk.Tk()
-root.title("Simple Soundboard")
-root.geometry("300x150")
+root = tkinter.Tk()
+root.title("ElderHank Soundboard")
+root.geometry("400x200")
+
+transport_bar = tkinter.Frame(root)
+transport_bar.pack(side=tkinter.BOTTOM, fill=tkinter.X, pady=10)
 
 # Create a button to play a sound
 # Replace 'path/to/your/soundfile.mp3' with the actual path to your sound file
-play_button = tk.Button(root, text="Play Ambience", command=lambda: play_sound('/Users/henryallen/Music/Logic/Wynatia/Sketches'))
-play_button.pack(pady=10)
+play_button = tkinter.Button(transport_bar, text="Play Ambience", command=lambda: play_sound('../data/music/skyrim_awake.wav'))
+play_button.pack(side=tkinter.LEFT, padx=5, pady=5, expand=True)
 
 # Create a button to stop the sound
-stop_button = tk.Button(root, text="Stop", command=stop_sound)
-stop_button.pack(pady=10)
+stop_button = tkinter.Button(transport_bar, text="Stop", command=stop_sound)
+stop_button.pack(side=tkinter.RIGHT, padx=5, pady=5, expand=True)
 
 # Run the application
 root.mainloop()
