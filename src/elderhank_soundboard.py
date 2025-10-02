@@ -18,7 +18,6 @@ def stop_sound():
 root = tkinter.Tk()
 root.title("ElderHank Soundboard")
 root.geometry("400x200")
-root.configure(bg="#1f2f16")
 
 transport_bar = tkinter.Frame(root)
 transport_bar.pack(side=tkinter.BOTTOM, fill=tkinter.X, pady=10)
