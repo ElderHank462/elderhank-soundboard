@@ -1,5 +1,12 @@
-import tkinter
+import tkinter as tk
 from pygame import mixer
+
+
+class Track:
+    # FIELDS
+    #
+    test_var = "test"
+
 
 mixer.init()
 
@@ -15,24 +22,24 @@ def stop_sound():
     """Stops the currently playing sound."""
     mixer.music.stop()
 
-root = tkinter.Tk()
+root = tk.Tk()
 root.title("ElderHank Soundboard")
 root.geometry("400x200")
 
-transport_bar = tkinter.Frame(root)
-transport_bar.pack(side=tkinter.BOTTOM, fill=tkinter.X, pady=10)
+transport_bar = tk.Frame(root)
+transport_bar.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
 
-play_frame = tkinter.Frame(transport_bar)
-play_frame.pack(side=tkinter.LEFT, padx=5, pady=5, expand=True)
+play_frame = tk.Frame(transport_bar)
+play_frame.pack(side=tk.LEFT, padx=5, pady=5, expand=True)
 
 # label creation
-test_label = tkinter.Label(play_frame, text="Active")
-test_label.pack(side=tkinter.TOP, pady=5)
+test_label = tk.Label(play_frame, text="Active")
+test_label.pack(side=tk.TOP, pady=5)
 
-play_button = tkinter.Button(play_frame, text="Play Ambience", command=lambda: play_sound('../data/music/skyrim_awake.wav'))
-play_button.pack(side=tkinter.BOTTOM, padx=5, pady=5, expand=True)
+play_button = tk.Button(play_frame, text="Play Ambience", command=lambda: play_sound('../data/music/skyrim_awake.wav'))
+play_button.pack(side=tk.BOTTOM, padx=5, pady=5, expand=True)
 
-stop_button = tkinter.Button(transport_bar, text="Stop", command=stop_sound)
-stop_button.pack(side=tkinter.RIGHT, padx=5, pady=5, expand=True)
+stop_button = tk.Button(transport_bar, text="Stop", command=stop_sound)
+stop_button.pack(side=tk.RIGHT, padx=5, pady=5, expand=True)
 
 root.mainloop()
