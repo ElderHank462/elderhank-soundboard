@@ -22,7 +22,7 @@ TEXT_COLOR = "#dcdacd"
 #========== PYTHON COMPONENTS ==========#
 class MusicTrack:
     """
-    
+
     """
     def __init__(self):
         pass
@@ -51,6 +51,20 @@ music = MusicTrack()
 
 #========== UI FACTORY FUNCTIONS ==========#
 def create_transport_button(parent, text, command, color, hover_color, scale_factor=1):
+    """
+    Factory method for creating a transport control.
+
+    Args:
+        parent: the parent tkinter widget
+        text: the text to display on the button
+        command: the function to call when the button is pressed
+        color: the color of the button when it is not being hovered over
+        hover_color: the color of the button when it is being hovered over
+        scale_factor: the factor to scale the button by (defaults to 1)
+
+    Returns:
+        CTkButton: A complete button instance
+    """
     font_tuple = (DEFAULT_FONT[0], DEFAULT_FONT[1] * scale_factor, DEFAULT_FONT[2])
     
     button = ctk.CTkButton(
