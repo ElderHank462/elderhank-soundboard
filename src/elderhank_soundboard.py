@@ -42,7 +42,7 @@ class TransportBar:
 
 class MusicTrack:
     """
-    The MusicTrack for the soundboard, containing the track UI and methods to control playback.
+    The music track for the soundboard, containing the track UI and methods to control playback.
     """
     def __init__(self, master_widget):
         self.master_widget = master_widget
@@ -88,6 +88,7 @@ class MusicTrack:
         numeric_volume = round(float(new_volume))
         self.music_volume_label.configure(text=f"{numeric_volume}%")
         mixer.music.set_volume(numeric_volume * 0.01)
+
 
 #========== UI FACTORY FUNCTIONS ==========#
 def create_transport_button(parent, text, command, color, hover_color, scale_factor=1):
