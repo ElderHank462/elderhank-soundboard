@@ -20,15 +20,54 @@ TEXT_COLOR = "#dcdacd"
 
 
 #========== PYTHON COMPONENTS ==========#
+class TransportBar:
+    """
+    
+    """
+    def __init__(self, master_widget, label_text, play_command, stop_command, scale_factor=1):
+        self.master_widget = master_widget
+        
+        self.transport_bar = ctk.CTkFrame(self.master_widget, width=400, fg_color=FRAME_COLOR)
+        self.transport_bar.pack(side=ctk.BOTTOM, expand=True)
+
+        self.transport_bar_label = ctk.CTkLabel(self.transport_bar, text=label_text, text_color=TEXT_COLOR)
+        self.transport_bar_label.pack(side=ctk.TOP, pady=5)
+
+        self.stop_button = create_transport_button(self.transport_bar, "Stop", stop_command, STOP_BUTTON_COLOR, STOP_BUTTON_HOVER_COLOR, scale_factor)
+        self.stop_button.pack(side=ctk.RIGHT, padx=5, pady=5, expand=True)
+
+        # TODO: Make global play button start both music and ambience channels
+        self.play_button = create_transport_button(self.transport_bar, "Play", play_command, PLAY_BUTTON_COLOR, PLAY_BUTTON_HOVER_COLOR, scale_factor)
+        self.play_button.pack(side=ctk.LEFT, padx=5, pady=5, expand=True)
+
 class MusicTrack:
     """
-
+    The MusicTrack for the soundboard, containing the track UI and methods to control playback.
     """
-    def __init__(self):
-        pass
+    def __init__(self, master_widget):
+        self.master_widget = master_widget
+        self.music_track = ctk.CTkFrame(self.master_widget, fg_color=FRAME_COLOR)
+        self.music_track.pack(side=ctk.LEFT, padx=5, pady=5, expand=True)
+
+        self.music_transport_bar = TransportBar(self.music_track, "Music", lambda: self.play('./data/music/skyrim_awake.wav'), lambda: self.stop(), 0.6)
+        self.music_transport_bar.transport_bar.pack(side=ctk.BOTTOM, fill=ctk.X)
+
+
+        self.music_volume_label = ctk.CTkLabel(self.music_track, text="100%", text_color=TEXT_COLOR)
+        self.music_volume_label.pack(side=ctk.BOTTOM, pady=5)
+
+        self.music_volume = ctk.CTkSlider(self.music_track, from_=0, to=100, command=self.set_volume, orientation=ctk.VERTICAL)
+        self.music_volume.set(100)
+        self.music_volume.pack(fill=ctk.Y, padx=5, pady=5)
+
 
     def play(self, sound_file):
-        """Plays a specified sound file."""
+        """
+        Plays a specified sound file.
+        
+        Args:
+            sound_file: the path to a sound file
+        """
         try:
             mixer.music.load(sound_file)
             mixer.music.play()
@@ -36,18 +75,19 @@ class MusicTrack:
             print(f"Error playing sound: {e}")
 
     def stop(self):
-        """Stops the currently playing sound."""
+        """Stops the music that is playing currently."""
         mixer.music.stop()
 
     def set_volume(self, new_volume):
         """
+        Set the volume of the music in the mixer and update the UI.
 
+        Args:
+            new_volume: the new volume to set
         """
-        float_volume = float(new_volume)
-        mixer.music.set_volume(float_volume)
-
-music = MusicTrack()
-
+        numeric_volume = round(float(new_volume))
+        self.music_volume_label.configure(text=f"{numeric_volume}%")
+        mixer.music.set_volume(numeric_volume * 0.01)
 
 #========== UI FACTORY FUNCTIONS ==========#
 def create_transport_button(parent, text, command, color, hover_color, scale_factor=1):
@@ -87,47 +127,24 @@ root.title("ElderHank Soundboard")
 root.geometry("800x400")
 
 #~~~GLOBAL TRANSPORT BAR~~~#
-transport_bar = ctk.CTkFrame(root, width=400, fg_color=FRAME_COLOR)
-transport_bar.pack(side=ctk.BOTTOM, expand=True)
+global_transport = TransportBar(root, "Global Controls", lambda: music_track.play('./data/music/skyrim_awake.wav'), lambda: mixer.stop())
 
-transport_bar_label = ctk.CTkLabel(transport_bar, text="Global Controls")
-transport_bar_label.pack(side=ctk.TOP, pady=5)
+# transport_bar = ctk.CTkFrame(root, width=400, fg_color=FRAME_COLOR)
+# transport_bar.pack(side=ctk.BOTTOM, expand=True)
 
-stop_button = create_transport_button(transport_bar, "Stop", lambda: mixer.stop(), STOP_BUTTON_COLOR, STOP_BUTTON_HOVER_COLOR)
-stop_button.pack(side=ctk.RIGHT, padx=5, pady=5, expand=True)
+# transport_bar_label = ctk.CTkLabel(transport_bar, text="Global Controls", text_color=TEXT_COLOR)
+# transport_bar_label.pack(side=ctk.TOP, pady=5)
 
-# TODO: Make global play button start both music and ambience channels
-play_button = create_transport_button(transport_bar, "Play", lambda: music.play('./data/music/skyrim_awake.wav'), PLAY_BUTTON_COLOR, PLAY_BUTTON_HOVER_COLOR)
-play_button.pack(side=ctk.LEFT, padx=5, pady=5, expand=True)
+# stop_button = create_transport_button(transport_bar, "Stop", lambda: mixer.stop(), STOP_BUTTON_COLOR, STOP_BUTTON_HOVER_COLOR)
+# stop_button.pack(side=ctk.RIGHT, padx=5, pady=5, expand=True)
+
+# # TODO: Make global play button start both music and ambience channels
+# play_button = create_transport_button(transport_bar, "Play", lambda: music.play('./data/music/skyrim_awake.wav'), PLAY_BUTTON_COLOR, PLAY_BUTTON_HOVER_COLOR)
+# play_button.pack(side=ctk.LEFT, padx=5, pady=5, expand=True)
 
 #~~~MUSIC TRACK~~~#
-music_track = ctk.CTkFrame(root, fg_color=FRAME_COLOR)
-music_track.pack(side=ctk.LEFT, padx=5, pady=5, expand=True)
+music_track = MusicTrack(root)
 
-music_transport_bar = ctk.CTkFrame(music_track, fg_color=FRAME_COLOR)
-music_transport_bar.pack(side=ctk.BOTTOM, fill=ctk.X)
-
-music_stop_button = create_transport_button(music_transport_bar, "Stop", lambda: music.stop(), STOP_BUTTON_COLOR, STOP_BUTTON_HOVER_COLOR, 0.6)
-music_stop_button.pack(side=ctk.RIGHT, padx=5, pady=5, expand=True)
-
-music_play_button = create_transport_button(music_transport_bar, "Play", lambda: music.play('./data/music/skyrim_awake.wav'), PLAY_BUTTON_COLOR, PLAY_BUTTON_HOVER_COLOR, 0.6)
-music_play_button.pack(side=ctk.BOTTOM, padx=5, pady=5, expand=True)
-
-
-music_volume_label = ctk.CTkLabel(music_track, text="100%")
-music_volume_label.pack(side=ctk.BOTTOM, pady=5)
-
-def set_music_volume(new_volume):
-    """
-    
-    """
-    numeric_volume = round(float(new_volume))
-    music_volume_label.configure(text=f"{numeric_volume}%")
-    music.set_volume(numeric_volume * 0.01)
-
-music_volume = ctk.CTkSlider(music_track, from_=0, to=100, command=set_music_volume, orientation=ctk.VERTICAL)
-music_volume.set(100)
-music_volume.pack(fill=ctk.Y, padx=5, pady=5)
 
 
 root.mainloop()
