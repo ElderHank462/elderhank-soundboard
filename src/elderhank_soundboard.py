@@ -19,6 +19,12 @@ STOP_BUTTON_HOVER_COLOR = "#40545F"
 TEXT_COLOR = "#dcdacd"
 
 
+#========== GLOBAL FUNCTIONS ==========#
+def stop_all():
+    mixer.stop()
+    mixer.music.stop()
+
+
 #========== PYTHON COMPONENTS ==========#
 class TransportBar:
     """
@@ -128,7 +134,7 @@ root.title("ElderHank Soundboard")
 root.geometry("800x400")
 
 #~~~GLOBAL TRANSPORT BAR~~~#
-global_transport = TransportBar(root, "Global Controls", lambda: music_track.play('./data/music/skyrim_awake.wav'), lambda: mixer.stop())
+global_transport = TransportBar(root, "Global Controls", lambda: music_track.play('./data/music/skyrim_awake.wav'), lambda: stop_all())
 
 # transport_bar = ctk.CTkFrame(root, width=400, fg_color=FRAME_COLOR)
 # transport_bar.pack(side=ctk.BOTTOM, expand=True)
