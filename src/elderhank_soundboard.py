@@ -4,7 +4,7 @@ from pygame import mixer
 import math
 
 mixer.init()
-mixer.set_num_channels(2)
+mixer.set_num_channels(1)
 
 #========== STYLES ==========#
 DEFAULT_FONT = ("CTkFont", 24, "normal")
@@ -142,7 +142,7 @@ class AmbienceTrack:
         """
         numeric_volume = round(float(new_volume))
         self.ambience_volume_label.configure(text=f"{numeric_volume}%")
-        mixer.set_volume(numeric_volume * 0.01)
+        mixer.Channel(0).set_volume(numeric_volume * 0.01)
 
 #========== UI FACTORY FUNCTIONS ==========#
 def create_transport_button(parent, text, command, color, hover_color, scale_factor=1):
