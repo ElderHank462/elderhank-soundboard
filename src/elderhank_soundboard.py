@@ -21,6 +21,10 @@ TEXT_COLOR = "#dcdacd"
 
 
 #========== GLOBAL FUNCTIONS ==========#
+# def play_all():
+#     mixer.play()
+#     mixer.music.play()
+
 def stop_all():
     mixer.stop()
     mixer.music.stop()
@@ -43,9 +47,14 @@ class TransportBar:
         self.stop_button = create_transport_button(self.transport_bar, "Stop", stop_command, STOP_BUTTON_COLOR, STOP_BUTTON_HOVER_COLOR, scale_factor)
         self.stop_button.pack(side=ctk.RIGHT, padx=5, pady=5, expand=True)
 
+
         # TODO: Make global play button start both music and ambience channels
         self.play_button = create_transport_button(self.transport_bar, "Play", play_command, PLAY_BUTTON_COLOR, PLAY_BUTTON_HOVER_COLOR, scale_factor)
         self.play_button.pack(side=ctk.LEFT, padx=5, pady=5, expand=True)
+        
+        # TODO: Fix global play button and remove this
+        if label_text == "Global Controls":
+            self.play_button.configure(state='disabled')
 
 class MusicTrack:
     """
@@ -189,7 +198,7 @@ root.columnconfigure(2, weight=0)
 root.columnconfigure(3, weight=1)
 
 #~~~GLOBAL TRANSPORT BAR~~~#
-global_transport = TransportBar(root, "Global Controls", lambda: music_track.play('./data/music/skyrim_awake.wav'), lambda: stop_all())
+global_transport = TransportBar(root, "Global Controls", lambda: mixer.music.play(), lambda: stop_all())
 
 
 
