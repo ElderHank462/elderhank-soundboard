@@ -7,7 +7,8 @@ mixer.init()
 mixer.set_num_channels(1)
 
 #========== STYLES ==========#
-DEFAULT_FONT = ("CTkFont", 24, "normal")
+BUTTON_FONT = ("CTkFont", 24, "normal")
+DEFAULT_FONT = ("CTkFont", 18, "normal")
 
 
 BACKGROUND_COLOR = "#30342E"
@@ -34,9 +35,9 @@ class TransportBar:
         self.master_widget = master_widget
         
         self.transport_bar = ctk.CTkFrame(self.master_widget, width=400, fg_color=FRAME_COLOR)
-        self.transport_bar.pack(side=ctk.BOTTOM, expand=True)
+        self.transport_bar.grid(row=1, column=1, columnspan=2, padx=10, pady=10, sticky="ns")
 
-        self.transport_bar_label = ctk.CTkLabel(self.transport_bar, text=label_text, text_color=TEXT_COLOR)
+        self.transport_bar_label = ctk.CTkLabel(self.transport_bar, text=label_text, text_color=TEXT_COLOR, font=DEFAULT_FONT)
         self.transport_bar_label.pack(side=ctk.TOP, pady=5)
 
         self.stop_button = create_transport_button(self.transport_bar, "Stop", stop_command, STOP_BUTTON_COLOR, STOP_BUTTON_HOVER_COLOR, scale_factor)
@@ -53,7 +54,7 @@ class MusicTrack:
     def __init__(self, master_widget):
         self.master_widget = master_widget
         self.music_track = ctk.CTkFrame(self.master_widget, fg_color=FRAME_COLOR)
-        self.music_track.pack(side=ctk.LEFT, padx=5, pady=5, expand=True)
+        self.music_track.grid(row=0, column=1, padx=10, pady=10, sticky="ns")
 
         self.music_transport_bar = TransportBar(self.music_track, "Music", lambda: self.play('./data/music/skyrim_awake.wav'), lambda: self.stop(), 0.6)
         self.music_transport_bar.transport_bar.pack(side=ctk.BOTTOM, fill=ctk.X)
@@ -64,7 +65,7 @@ class MusicTrack:
 
         self.music_volume = ctk.CTkSlider(self.music_track, from_=0, to=100, command=self.set_volume, orientation=ctk.VERTICAL)
         self.music_volume.set(100)
-        self.music_volume.pack(fill=ctk.Y, padx=5, pady=5)
+        self.music_volume.pack(fill=ctk.Y, padx=5, pady=5, expand=True)
 
 
     def play(self, sound_file):
@@ -102,7 +103,7 @@ class AmbienceTrack:
     def __init__(self, master_widget):
         self.master_widget = master_widget
         self.ambience_track = ctk.CTkFrame(self.master_widget, fg_color=FRAME_COLOR)
-        self.ambience_track.pack(side=ctk.LEFT, padx=5, pady=5, expand=True)
+        self.ambience_track.grid(row=0, column=2, padx=10, pady=10, sticky="ns")
 
         self.ambience_transport_bar = TransportBar(self.ambience_track, "Ambience", lambda: self.play('./data/ambience/rain.mp3'), lambda: self.stop(), 0.6)
         self.ambience_transport_bar.transport_bar.pack(side=ctk.BOTTOM, fill=ctk.X)
@@ -113,7 +114,7 @@ class AmbienceTrack:
 
         self.ambience_volume = ctk.CTkSlider(self.ambience_track, from_=0, to=100, command=self.set_volume, orientation=ctk.VERTICAL)
         self.ambience_volume.set(100)
-        self.ambience_volume.pack(fill=ctk.Y, padx=5, pady=5)
+        self.ambience_volume.pack(fill=ctk.Y, padx=5, pady=5, expand=True)
 
 
     def play(self, sound_file):
@@ -160,7 +161,7 @@ def create_transport_button(parent, text, command, color, hover_color, scale_fac
     Returns:
         CTkButton: A complete button instance
     """
-    font_tuple = (DEFAULT_FONT[0], DEFAULT_FONT[1] * scale_factor, DEFAULT_FONT[2])
+    font_tuple = (BUTTON_FONT[0], BUTTON_FONT[1] * scale_factor, BUTTON_FONT[2])
     
     button = ctk.CTkButton(
         parent, 
@@ -179,13 +180,18 @@ def create_transport_button(parent, text, command, color, hover_color, scale_fac
 #========== UI CONSTRUCTION ==========#
 root = ctk.CTk(fg_color=BACKGROUND_COLOR)
 root.title("ElderHank Soundboard")
-root.geometry("800x400")
+root.geometry("450x600")
+root.rowconfigure(0, weight=1)
+root.rowconfigure(1, weight=0)
+root.columnconfigure(0, weight=1)
+root.columnconfigure(1, weight=0)
+root.columnconfigure(2, weight=0)
+root.columnconfigure(3, weight=1)
 
 #~~~GLOBAL TRANSPORT BAR~~~#
 global_transport = TransportBar(root, "Global Controls", lambda: music_track.play('./data/music/skyrim_awake.wav'), lambda: stop_all())
 
 
-# # TODO: Make global play button start both music and ambience channels
 
 #~~~MUSIC TRACK~~~#
 music_track = MusicTrack(root)
