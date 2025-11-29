@@ -3,6 +3,13 @@ import customtkinter as ctk
 from pygame import mixer
 import math
 
+
+class Track:
+    # FIELDS
+    #
+    test_var = "test"
+
+
 mixer.init()
 mixer.set_num_channels(1)
 
