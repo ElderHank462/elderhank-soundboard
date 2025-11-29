@@ -1,5 +1,7 @@
 import tkinter as tk
+import customtkinter as ctk
 from pygame import mixer
+import math
 
 
 class Track:
@@ -9,37 +11,210 @@ class Track:
 
 
 mixer.init()
+mixer.set_num_channels(1)
 
-def play_sound(sound_file):
-    """Plays a specified sound file."""
-    try:
-        mixer.music.load(sound_file)
-        mixer.music.play()
-    except Exception as e:
-        print(f"Error playing sound: {e}")
+#========== STYLES ==========#
+BUTTON_FONT = ("CTkFont", 24, "normal")
+DEFAULT_FONT = ("CTkFont", 18, "normal")
 
-def stop_sound():
-    """Stops the currently playing sound."""
+
+BACKGROUND_COLOR = "#30342E"
+FRAME_COLOR = "#424640"
+PLAY_BUTTON_COLOR = "#395B50"
+PLAY_BUTTON_HOVER_COLOR = "#2a443c"
+STOP_BUTTON_COLOR = "#5A7684"
+STOP_BUTTON_HOVER_COLOR = "#40545F"
+TEXT_COLOR = "#dcdacd"
+
+
+#========== GLOBAL FUNCTIONS ==========#
+# def play_all():
+#     mixer.play()
+#     mixer.music.play()
+
+def stop_all():
+    mixer.stop()
     mixer.music.stop()
 
-root = tk.Tk()
+
+#========== PYTHON COMPONENTS ==========#
+class TransportBar:
+    """
+    
+    """
+    def __init__(self, master_widget, label_text, play_command, stop_command, scale_factor=1):
+        self.master_widget = master_widget
+        
+        self.transport_bar = ctk.CTkFrame(self.master_widget, width=400, fg_color=FRAME_COLOR)
+        self.transport_bar.grid(row=1, column=1, columnspan=2, padx=10, pady=10, sticky="ns")
+
+        self.transport_bar_label = ctk.CTkLabel(self.transport_bar, text=label_text, text_color=TEXT_COLOR, font=DEFAULT_FONT)
+        self.transport_bar_label.pack(side=ctk.TOP, pady=5)
+
+        self.stop_button = create_transport_button(self.transport_bar, "Stop", stop_command, STOP_BUTTON_COLOR, STOP_BUTTON_HOVER_COLOR, scale_factor)
+        self.stop_button.pack(side=ctk.RIGHT, padx=5, pady=5, expand=True)
+
+
+        # TODO: Make global play button start both music and ambience channels
+        self.play_button = create_transport_button(self.transport_bar, "Play", play_command, PLAY_BUTTON_COLOR, PLAY_BUTTON_HOVER_COLOR, scale_factor)
+        self.play_button.pack(side=ctk.LEFT, padx=5, pady=5, expand=True)
+        
+        # TODO: Fix global play button and remove this
+        if label_text == "Global Controls":
+            self.play_button.configure(state='disabled')
+
+class MusicTrack:
+    """
+    The music track for the soundboard, containing the track UI and methods to control playback.
+    """
+    def __init__(self, master_widget):
+        self.master_widget = master_widget
+        self.music_track = ctk.CTkFrame(self.master_widget, fg_color=FRAME_COLOR)
+        self.music_track.grid(row=0, column=1, padx=10, pady=10, sticky="ns")
+
+        self.music_transport_bar = TransportBar(self.music_track, "Music", lambda: self.play('./data/music/skyrim_awake.wav'), lambda: self.stop(), 0.6)
+        self.music_transport_bar.transport_bar.pack(side=ctk.BOTTOM, fill=ctk.X)
+
+
+        self.music_volume_label = ctk.CTkLabel(self.music_track, text="100%", text_color=TEXT_COLOR)
+        self.music_volume_label.pack(side=ctk.BOTTOM, pady=5)
+
+        self.music_volume = ctk.CTkSlider(self.music_track, from_=0, to=100, command=self.set_volume, orientation=ctk.VERTICAL)
+        self.music_volume.set(100)
+        self.music_volume.pack(fill=ctk.Y, padx=5, pady=5, expand=True)
+
+
+    def play(self, sound_file):
+        """
+        Plays a specified sound file.
+        
+        Args:
+            sound_file: the path to a sound file
+        """
+        try:
+            mixer.music.load(sound_file)
+            mixer.music.play()
+        except Exception as e:
+            print(f"Error playing sound: {e}")
+
+    def stop(self):
+        """Stops the music that is playing currently."""
+        mixer.music.stop()
+
+    def set_volume(self, new_volume):
+        """
+        Set the volume of the music in the mixer and update the UI.
+
+        Args:
+            new_volume: the new volume to set
+        """
+        numeric_volume = round(float(new_volume))
+        self.music_volume_label.configure(text=f"{numeric_volume}%")
+        mixer.music.set_volume(numeric_volume * 0.01)
+
+class AmbienceTrack:
+    """
+    The ambience track for the soundboard, containing the track UI and methods to control playback.
+    """
+    def __init__(self, master_widget):
+        self.master_widget = master_widget
+        self.ambience_track = ctk.CTkFrame(self.master_widget, fg_color=FRAME_COLOR)
+        self.ambience_track.grid(row=0, column=2, padx=10, pady=10, sticky="ns")
+
+        self.ambience_transport_bar = TransportBar(self.ambience_track, "Ambience", lambda: self.play('./data/ambience/rain.mp3'), lambda: self.stop(), 0.6)
+        self.ambience_transport_bar.transport_bar.pack(side=ctk.BOTTOM, fill=ctk.X)
+
+
+        self.ambience_volume_label = ctk.CTkLabel(self.ambience_track, text="100%", text_color=TEXT_COLOR)
+        self.ambience_volume_label.pack(side=ctk.BOTTOM, pady=5)
+
+        self.ambience_volume = ctk.CTkSlider(self.ambience_track, from_=0, to=100, command=self.set_volume, orientation=ctk.VERTICAL)
+        self.ambience_volume.set(100)
+        self.ambience_volume.pack(fill=ctk.Y, padx=5, pady=5, expand=True)
+
+
+    def play(self, sound_file):
+        """
+        Plays a specified sound file.
+        
+        Args:
+            sound_file: the path to a sound file
+        """
+        try:
+            ambience = mixer.Sound(sound_file)
+            ambience.play()
+        except Exception as e:
+            print(f"Error playing sound: {e}")
+
+    def stop(self):
+        """Stops the music that is playing currently."""
+        mixer.stop()
+
+    def set_volume(self, new_volume):
+        """
+        Set the volume of the music in the mixer and update the UI.
+
+        Args:
+            new_volume: the new volume to set
+        """
+        numeric_volume = round(float(new_volume))
+        self.ambience_volume_label.configure(text=f"{numeric_volume}%")
+        mixer.Channel(0).set_volume(numeric_volume * 0.01)
+
+#========== UI FACTORY FUNCTIONS ==========#
+def create_transport_button(parent, text, command, color, hover_color, scale_factor=1):
+    """
+    Factory method for creating a transport control.
+
+    Args:
+        parent: the parent tkinter widget
+        text: the text to display on the button
+        command: the function to call when the button is pressed
+        color: the color of the button when it is not being hovered over
+        hover_color: the color of the button when it is being hovered over
+        scale_factor: the factor to scale the button by (defaults to 1)
+
+    Returns:
+        CTkButton: A complete button instance
+    """
+    font_tuple = (BUTTON_FONT[0], BUTTON_FONT[1] * scale_factor, BUTTON_FONT[2])
+    
+    button = ctk.CTkButton(
+        parent, 
+        width=scale_factor * 100, 
+        height=scale_factor * 80, 
+        text=text, 
+        command=command, 
+        fg_color=color, 
+        text_color=TEXT_COLOR, 
+        hover_color=hover_color,
+        font=font_tuple
+    )
+    return button
+
+
+#========== UI CONSTRUCTION ==========#
+root = ctk.CTk(fg_color=BACKGROUND_COLOR)
 root.title("ElderHank Soundboard")
-root.geometry("400x200")
+root.geometry("450x600")
+root.rowconfigure(0, weight=1)
+root.rowconfigure(1, weight=0)
+root.columnconfigure(0, weight=1)
+root.columnconfigure(1, weight=0)
+root.columnconfigure(2, weight=0)
+root.columnconfigure(3, weight=1)
 
-transport_bar = tk.Frame(root)
-transport_bar.pack(side=tk.BOTTOM, fill=tk.X, pady=10)
+#~~~GLOBAL TRANSPORT BAR~~~#
+global_transport = TransportBar(root, "Global Controls", lambda: mixer.music.play(), lambda: stop_all())
 
-play_frame = tk.Frame(transport_bar)
-play_frame.pack(side=tk.LEFT, padx=5, pady=5, expand=True)
 
-# label creation
-test_label = tk.Label(play_frame, text="Active")
-test_label.pack(side=tk.TOP, pady=5)
 
-play_button = tk.Button(play_frame, text="Play Ambience", command=lambda: play_sound('../data/music/skyrim_awake.wav'))
-play_button.pack(side=tk.BOTTOM, padx=5, pady=5, expand=True)
+#~~~MUSIC TRACK~~~#
+music_track = MusicTrack(root)
 
-stop_button = tk.Button(transport_bar, text="Stop", command=stop_sound)
-stop_button.pack(side=tk.RIGHT, padx=5, pady=5, expand=True)
+#~~~AMBIENCE TRACK~~~#
+ambience_track = AmbienceTrack(root)
+
+
 
 root.mainloop()
