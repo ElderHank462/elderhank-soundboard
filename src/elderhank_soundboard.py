@@ -3,13 +3,6 @@ import customtkinter as ctk
 from pygame import mixer
 import math
 
-
-class Track:
-    # FIELDS
-    #
-    test_var = "test"
-
-
 mixer.init()
 mixer.set_num_channels(1)
 
@@ -142,7 +135,12 @@ class AmbienceTrack:
         """
         try:
             ambience = mixer.Sound(sound_file)
-            ambience.play()
+            vol = self.ambience_volume.get()
+            
+            channel = ambience.play()
+            if channel is not None:
+                channel.set_volume(vol * 0.01)
+                
         except Exception as e:
             print(f"Error playing sound: {e}")
 
